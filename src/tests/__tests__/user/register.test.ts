@@ -5,8 +5,10 @@ import type { DataSource } from 'typeorm';
 import { app } from '../../../app.js';
 import { AppDataSource } from '../../../config/data-source.js';
 import { logger } from '../../../config/logger.config.js';
-import { User } from '../../../entity/User.js';
 import { Roles } from '../../../constants/index.js';
+import { User } from '../../../entity/User.js';
+
+const REGISTER_API_ENDPOINT = '/api/v1/auth/register';
 
 describe('User Registration', () => {
     let dbConnection: DataSource;
@@ -30,8 +32,9 @@ describe('User Registration', () => {
 
     // Clear database tables before each test or else tests might interfere with each other
     beforeEach(async () => {
-        await dbConnection.dropDatabase();
-        await dbConnection.synchronize();
+        await dbConnection?.dropDatabase();
+        await dbConnection?.synchronize();
+        /*   await truncateTables(dbConnection); */
     });
 
     describe('Happy Path', () => {
@@ -44,7 +47,7 @@ describe('User Registration', () => {
             };
 
             const response = await request(app)
-                .post('/api/v1/auth/register')
+                .post(REGISTER_API_ENDPOINT)
                 .send(userData);
             expect(response.statusCode).toBe(201);
         });
@@ -58,7 +61,7 @@ describe('User Registration', () => {
             };
 
             const response = await request(app)
-                .post('/api/v1/auth/register')
+                .post(REGISTER_API_ENDPOINT)
                 .send(userData);
 
             expect(response.headers['content-type']).toEqual(
@@ -74,7 +77,7 @@ describe('User Registration', () => {
                 password: 'yetanothersecurepassword',
             };
 
-            await request(app).post('/api/v1/auth/register').send(userData);
+            await request(app).post(REGISTER_API_ENDPOINT).send(userData);
 
             const userRepository = dbConnection.getRepository(User);
             expect(await userRepository.find()).toHaveLength(1);
@@ -88,7 +91,7 @@ describe('User Registration', () => {
                 password: 'supersecurepassword',
             };
 
-            await request(app).post('/api/v1/auth/register').send(userData);
+            await request(app).post(REGISTER_API_ENDPOINT).send(userData);
 
             const userRepository = dbConnection.getRepository(User);
             const users = await userRepository.find();
@@ -103,7 +106,7 @@ describe('User Registration', () => {
                 password: 'yetanothersecurepassword',
             };
 
-            await request(app).post('/api/v1/auth/register').send(userData);
+            await request(app).post(REGISTER_API_ENDPOINT).send(userData);
 
             const userRepository = dbConnection.getRepository(User);
             const users = await userRepository.find();
@@ -118,16 +121,57 @@ describe('User Registration', () => {
                 password: 'securepassword',
             };
 
-            await request(app).post('/api/v1/auth/register').send(userData);
+            await request(app).post(REGISTER_API_ENDPOINT).send(userData);
 
             const userRepository = dbConnection.getRepository(User);
             const users = await userRepository.find();
             expect(users[0]!).toHaveProperty('role');
             expect(users[0]!.role).toBe(Roles.CUSTOMER);
         });
+
+        it('should store the hashed password in the database', async () => {
+            const userData = {
+                firstName: 'Eve',
+                lastName: 'Adams',
+                email: 'eve.adams@example.com',
+                password: 'securepassword',
+            };
+
+            await request(app).post(REGISTER_API_ENDPOINT).send(userData);
+
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find({
+                select: ['password'],
+            });
+            expect(users[0]?.password).not.toBe(userData.password);
+            expect(users[0]?.password).toHaveLength(60);
+            expect(users[0]?.password).toMatch(/^\$2[a|b]\$\d+\$/);
+        });
+
+        it('should return 400 status code if email is already exists', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'K',
+                email: 'rakesh@mern.space',
+                password: 'password',
+            };
+            const userRepository = dbConnection.getRepository(User);
+            await userRepository.save({ ...userData, role: Roles.CUSTOMER });
+
+            // Act
+            const response = await request(app)
+                .post(REGISTER_API_ENDPOINT)
+                .send(userData);
+
+            const users = await userRepository.find();
+            // Assert
+            expect(response.statusCode).toBe(400);
+            expect(users).toHaveLength(1);
+        });
     });
 
-    describe.skip('Sad Path', () => {
+    describe('Sad Path', () => {
         it('should return status code 400 for invalid user data', async () => {
             const invalidUserData = {
                 firstName: '',
@@ -137,9 +181,146 @@ describe('User Registration', () => {
             };
 
             const response = await request(app)
-                .post('/api/v1/auth/register')
+                .post(REGISTER_API_ENDPOINT)
                 .send(invalidUserData);
             expect(response.statusCode).toBe(400);
+        });
+
+        it('should return 400 status code if email field is missing', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'K',
+                email: '',
+                password: 'password',
+            };
+            // Act
+            const response = await request(app)
+                .post(REGISTER_API_ENDPOINT)
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+
+        it('should return 400 status code if firstName is missing', async () => {
+            // Arrange
+            const userData = {
+                firstName: '',
+                lastName: 'K',
+                email: 'rakesh@mern.space',
+                password: 'password',
+            };
+            // Act
+            const response = await request(app)
+                .post(REGISTER_API_ENDPOINT)
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+        it('should return 400 status code if lastName is missing', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: '',
+                email: 'rakesh@mern.space',
+                password: 'password',
+            };
+            // Act
+            const response = await request(app)
+                .post(REGISTER_API_ENDPOINT)
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+
+        it('should return 400 status code if password is missing', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'K',
+                email: 'rakesh@mern.space',
+                password: '',
+            };
+            // Act
+            const response = await request(app)
+                .post(REGISTER_API_ENDPOINT)
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+    });
+
+    describe('Fields are not in proper format', () => {
+        it('should trim the email field', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'Diana',
+                lastName: 'Prince',
+                email: ' diana.prince@example.com ',
+                password: 'securepassword',
+            };
+            // Act
+            await request(app).post(REGISTER_API_ENDPOINT).send(userData);
+
+            // Assert
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users[0]!.email).toBe('diana.prince@example.com');
+            /* expect(users[0]!).toHaveProperty('email'); */
+        });
+        it('should return 400 status code if email is not a valid email', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'K',
+                email: 'rakesh_mern.space', // Invalid email
+                password: 'password',
+            };
+            // Act
+            const response = await request(app)
+                .post(REGISTER_API_ENDPOINT)
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
+        });
+        it.skip('should return 400 status code if password length is less than 8 chars', async () => {
+            // Arrange
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'K',
+                email: 'rakesh@mern.space',
+                password: 'pass', // less than 8 chars
+            };
+            // Act
+            const response = await request(app)
+                .post(REGISTER_API_ENDPOINT)
+                .send(userData);
+
+            // Assert
+            expect(response.statusCode).toBe(400);
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users).toHaveLength(0);
         });
     });
 });

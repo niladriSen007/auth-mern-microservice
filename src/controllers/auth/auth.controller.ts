@@ -1,4 +1,4 @@
-import type { Response } from 'express';
+import type { NextFunction, Response } from 'express';
 import { logger } from '../../config/logger.config.js';
 import type { RegisterUserRequest } from '../../dtos/auth/register-user.request.js';
 import type { AuthService } from '../../services/auth/auth.service.js';
@@ -7,7 +7,11 @@ import { HttpStatusCode } from '../../utils/status-codes.js';
 export class AuthController {
     constructor(private readonly authService: AuthService) {}
 
-    public async registerUser(req: RegisterUserRequest, res: Response) {
+    public async registerUser(
+        req: RegisterUserRequest,
+        res: Response,
+        next: NextFunction
+    ) {
         try {
             logger.info('Registering a new user', { body: req?.body });
             const result = await this.authService.registerUser(req);
@@ -20,11 +24,12 @@ export class AuthController {
             return result;
         } catch (error) {
             logger.error('Error creating a new user');
-            res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({
-                success: false,
-                message: 'Error creating a new user',
-                error: error,
-            });
+            next(
+                error
+                    ? error
+                    : new Error('Unknown error - AuthController.registerUser')
+            );
+            return;
         }
     }
 }

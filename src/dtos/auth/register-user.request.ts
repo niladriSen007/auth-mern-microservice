@@ -8,3 +8,10 @@ export interface RegisterUserRequest extends Request {
         lastName: string;
     };
 }
+
+export interface RegisterUserBody {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+}
