@@ -1,7 +1,21 @@
-import { Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('users')
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
+    // Numeric autoincrement id
+    @PrimaryGeneratedColumn('uuid')
+    id: string;
+
+    // Explicitly declare column types so TypeORM doesn't need to guess
+    @Column('text', { unique: true })
+    email: string;
+
+    @Column('text')
+    password: string;
+
+    @Column('text')
+    firstName: string;
+
+    @Column('text')
+    lastName: string;
 }

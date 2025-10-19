@@ -27,6 +27,11 @@ services:
             - NODE_ENV=development
             - CHOKIDAR_USEPOLLING=true # Enable polling for file changes on Windows
             - WATCHPACK_POLLING=true # Alternative polling for webpack-like tools
+            - DB_HOST=postgres-db   # 👈 Connect using service name
+            - DB_PORT=5432
+            - DB_USER=postgres
+            - DB_PASSWORD=postgres
+            - DB_NAME=mern_auth_db
         volumes:
             # Mount source code for live editing with cached performance
             - ./src:/usr/src/app/src:cached
@@ -46,6 +51,8 @@ services:
         restart: unless-stopped
         stdin_open: true # Enable interactive mode
         tty: true # Allocate a pseudo-TTY
+        depends_on:
+            - postgres-db
         networks:
             - app-network
 

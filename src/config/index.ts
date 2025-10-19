@@ -1,23 +1,23 @@
 import { config } from 'dotenv';
+import path from 'path';
 import type { ServerConfig } from './types.js';
-import path, { dirname } from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-function loadDotEnv() {
-    const env = config({
-        path: path.join(
-            __dirname,
-            `../../.env.${process.env.NODE_ENV || 'development'}`
-        ),
-    });
-    if (env.error) {
-        throw env.error;
+// Resolve .env path without using import.meta so this works under Jest (CJS) and Node ESM
+const envPath = path.resolve(
+    process.cwd(),
+    `.env.${process.env.NODE_ENV || 'development'}`
+);
+
+(() => {
+    const result = config({ path: envPath });
+    // Ignore missing file in certain environments (like tests); only throw on non-ENOENT errors
+    if (
+        result.error &&
+        (result.error as NodeJS.ErrnoException).code !== 'ENOENT'
+    ) {
+        throw result.error;
     }
-    return 'Environment variables loaded successfully';
-}
-loadDotEnv();
+})();
 
 export const serverConfig: ServerConfig = {
     PORT: Number(process.env.PORT) ?? 5501,

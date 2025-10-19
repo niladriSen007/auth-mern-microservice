@@ -31,9 +31,14 @@ export const logger = winston.createLogger({
             format: winston.format.combine(
                 winston.format.colorize(),
                 winston.format.timestamp({ format: 'MM-DD-YYYY HH:mm:ss' }),
-                winston.format.printf(({ level, message, timestamp }) => {
-                    // Preserve chalk colors in console output
-                    return `${timestamp} [${level}]: ${message}`;
+                winston.format.printf((info) => {
+                    const { level, message, timestamp, ...meta } =
+                        info as winston.Logform.TransformableInfo &
+                            Record<string, unknown>;
+                    const metaStr = Object.keys(meta).length
+                        ? ` ${JSON.stringify(meta)}`
+                        : '';
+                    return `${timestamp} [${level}]: ${message}${metaStr}`;
                 })
             ),
             silent: serverConfig?.NODE_ENV === 'test', // Disable console logging in test environment
