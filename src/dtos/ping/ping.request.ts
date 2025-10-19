@@ -1,3 +1,3 @@
 export interface PingRequest {
-  timestamp: number;
+    timestamp: number;
 }

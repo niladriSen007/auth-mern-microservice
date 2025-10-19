@@ -1,8 +1,7 @@
 export class PingRepository {
+    constructor() {}
 
-  constructor() { }
-
-  public ping(): string {
-    return 'pong';
-  }
+    public ping(): string {
+        return 'pong';
+    }
 }

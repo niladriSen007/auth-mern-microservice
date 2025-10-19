@@ -5,6 +5,7 @@ This project includes a comprehensive Docker Compose setup for development, test
 ## 🚀 Quick Start
 
 ### Development Environment
+
 ```bash
 # Start development environment with all services
 make setup-dev
@@ -14,6 +15,7 @@ docker-compose --profile development up --build
 ```
 
 ### Production Environment
+
 ```bash
 # Start production environment
 make setup-prod
@@ -24,13 +26,14 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml --profile produc
 
 ## 📋 Available Services
 
-| Service | Development Port | Production Port | Description |
-|---------|------------------|-----------------|-------------|
-| Auth Service | 5501 | 443 (HTTPS) | Main Node.js application |
+| Service      | Development Port | Production Port | Description              |
+| ------------ | ---------------- | --------------- | ------------------------ |
+| Auth Service | 5501             | 443 (HTTPS)     | Main Node.js application |
 
 ## 🔧 Environment Profiles
 
 ### Development (`--profile development`)
+
 - Hot reload enabled
 - Debug mode
 - Admin UIs included
@@ -38,6 +41,7 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml --profile produc
 - Source code mounted as volumes
 
 ### Production (`--profile production`)
+
 - Optimized builds
 - SSL/TLS encryption
 - Load balancer
@@ -46,11 +50,13 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml --profile produc
 - Internal networking only
 
 ### Testing (`--profile test`)
+
 - Test runner container
 - Test database
 - Isolated environment
 
 ### Database Only (`--profile database`)
+
 - MongoDB and Redis only
 - Useful for local development
 
@@ -120,6 +126,7 @@ MONGO_APP_PASSWORD=your_app_password
 ## 🏗️ Architecture
 
 ### Development Architecture
+
 ```
 ┌─────────────────┐    ┌─────────────────┐
 │   Auth Service  │────│    MongoDB      │
@@ -134,6 +141,7 @@ MONGO_APP_PASSWORD=your_app_password
 ```
 
 ### Production Architecture
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │      Nginx      │────│   Auth Service  │────│    MongoDB      │
@@ -167,11 +175,13 @@ docker/
 ## 🔒 Security Features
 
 ### Development
+
 - Basic authentication for admin UIs
 - Default passwords (change in production!)
 - Open ports for debugging
 
 ### Production
+
 - SSL/TLS encryption
 - Rate limiting
 - Security headers
@@ -183,11 +193,13 @@ docker/
 ## 📊 Monitoring & Logging
 
 ### Health Checks
+
 - Application health endpoint: `/api/ping`
 - Container health checks included
 - Nginx health endpoint: `/health`
 
 ### Logging
+
 - Application logs: `./logs/`
 - Nginx logs: `./logs/nginx/`
 - Structured JSON logging
@@ -198,68 +210,75 @@ docker/
 ### Common Issues
 
 1. **Port conflicts**
-   ```bash
-   # Check what's using the ports
-   netstat -tulpn | grep :5501
-   ```
+
+    ```bash
+    # Check what's using the ports
+    netstat -tulpn | grep :5501
+    ```
 
 2. **Permission issues**
-   ```bash
-   # Fix permissions for logs directory
-   sudo chown -R $USER:$USER logs/
-   ```
+
+    ```bash
+    # Fix permissions for logs directory
+    sudo chown -R $USER:$USER logs/
+    ```
 
 3. **SSL certificate issues**
-   ```bash
-   # Regenerate certificates
-   make ssl-certs
-   ```
+
+    ```bash
+    # Regenerate certificates
+    make ssl-certs
+    ```
 
 4. **Container won't start**
-   ```bash
-   # Check logs
-   docker-compose logs auth-service-dev
-   ```
+    ```bash
+    # Check logs
+    docker-compose logs auth-service-dev
+    ```
 
 ### Database Connection Issues
 
 1. **MongoDB connection refused**
-   ```bash
-   # Check if MongoDB is running
-   docker-compose ps mongodb
-   
-   # Check MongoDB logs
-   docker-compose logs mongodb
-   ```
+
+    ```bash
+    # Check if MongoDB is running
+    docker-compose ps mongodb
+
+    # Check MongoDB logs
+    docker-compose logs mongodb
+    ```
 
 2. **Redis connection issues**
-   ```bash
-   # Test Redis connection
-   docker-compose exec redis redis-cli ping
-   ```
+    ```bash
+    # Test Redis connection
+    docker-compose exec redis redis-cli ping
+    ```
 
 ## 🔄 Development Workflow
 
 1. **Start development environment**
-   ```bash
-   make setup-dev
-   ```
+
+    ```bash
+    make setup-dev
+    ```
 
 2. **Make code changes** (hot reload enabled)
 
 3. **Run tests**
-   ```bash
-   make test
-   ```
+
+    ```bash
+    make test
+    ```
 
 4. **Check logs**
-   ```bash
-   make logs-app
-   ```
+
+    ```bash
+    make logs-app
+    ```
 
 5. **Access database UIs**
-   - MongoDB Express: http://localhost:8081
-   - Redis Commander: http://localhost:8082
+    - MongoDB Express: http://localhost:8081
+    - Redis Commander: http://localhost:8082
 
 ## 🚀 Deployment
 
@@ -274,6 +293,7 @@ docker/
 - [ ] Configure backups
 
 ### Deploy to Production
+
 ```bash
 # Build and start production environment
 make prod-detached

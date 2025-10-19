@@ -1,3 +1,3 @@
 export type PongRequest = {
-  timestamp: number;
+    timestamp: number;
 };
