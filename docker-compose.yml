@@ -27,7 +27,7 @@ services:
             - NODE_ENV=development
             - CHOKIDAR_USEPOLLING=true # Enable polling for file changes on Windows
             - WATCHPACK_POLLING=true # Alternative polling for webpack-like tools
-            - DB_HOST=postgres-db   # 👈 Connect using service name
+            - DB_HOST=postgres-db # 👈 Connect using service name
             - DB_PORT=5432
             - DB_USER=postgres
             - DB_PASSWORD=postgres
