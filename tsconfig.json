@@ -11,7 +11,10 @@
         "target": "es2020",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
-        "types": ["jest", "node"],
+        "types": [
+            "jest",
+            "node"
+        ],
         // For nodejs:
         // "lib": ["esnext"],
         // "types": ["node"],
@@ -37,7 +40,12 @@
         "isolatedModules": true,
         "noUncheckedSideEffectImports": true,
         "moduleDetection": "force",
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
     },
-    "include": ["src", "tests"]
+    "include": [
+        "src",
+        "tests"
+    ]
 }
