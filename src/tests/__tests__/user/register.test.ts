@@ -2,11 +2,11 @@ import request from 'supertest';
 
 import type { DataSource } from 'typeorm';
 
-import { truncateTables } from '../../utils/index.js';
+import { app } from '../../../app.js';
 import { AppDataSource } from '../../../config/data-source.js';
 import { logger } from '../../../config/logger.config.js';
-import { app } from '../../../app.js';
 import { User } from '../../../entity/User.js';
+import { Roles } from '../../../constants/index.js';
 
 describe('User Registration', () => {
     let dbConnection: DataSource;
@@ -30,7 +30,8 @@ describe('User Registration', () => {
 
     // Clear database tables before each test or else tests might interfere with each other
     beforeEach(async () => {
-        await truncateTables(dbConnection);
+        await dbConnection.dropDatabase();
+        await dbConnection.synchronize();
     });
 
     describe('Happy Path', () => {
@@ -107,6 +108,22 @@ describe('User Registration', () => {
             const userRepository = dbConnection.getRepository(User);
             const users = await userRepository.find();
             expect(users[0]!.lastName).toBe('Brown');
+        });
+
+        it('Should assign the default role "customer" to the newly registered user', async () => {
+            const userData = {
+                firstName: 'Diana',
+                lastName: 'Prince',
+                email: 'diana.prince@example.com',
+                password: 'securepassword',
+            };
+
+            await request(app).post('/api/v1/auth/register').send(userData);
+
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users[0]!).toHaveProperty('role');
+            expect(users[0]!.role).toBe(Roles.CUSTOMER);
         });
     });
 

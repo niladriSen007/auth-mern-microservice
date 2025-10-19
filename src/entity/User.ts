@@ -18,4 +18,7 @@ export class User {
 
     @Column('text')
     lastName: string;
+
+    @Column('text')
+    role: string;
 }

@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
     username: serverConfig?.DB_USER || 'postgres',
     password: serverConfig?.DB_PASSWORD || 'postgres',
     database: serverConfig?.DB_NAME || 'mern_auth_db',
-    synchronize: serverConfig?.NODE_ENV !== 'production',
+    synchronize: false,
     logging: serverConfig?.NODE_ENV !== 'test',
     entities: [User],
     subscribers: [],
