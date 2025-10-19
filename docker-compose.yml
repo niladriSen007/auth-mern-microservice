@@ -1,0 +1,73 @@
+version: "3.9"
+
+services:
+  auth-service-dev:
+    build:
+      context: .
+      dockerfile: ./docker/dev/Dockerfile
+    ports:
+      - "5501:5501"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true # Enable polling for file changes on Windows
+      - WATCHPACK_POLLING=true   # Alternative polling for webpack-like tools
+    volumes:
+      # Mount source code for live editing with cached performance
+      - ./src:/usr/src/app/src:cached
+      # Mount configuration files
+      - ./package.json:/usr/src/app/package.json:ro
+      - ./pnpm-lock.yaml:/usr/src/app/pnpm-lock.yaml:ro
+      - ./tsconfig.json:/usr/src/app/tsconfig.json:ro
+      - ./tsconfig.jest.json:/usr/src/app/tsconfig.jest.json:ro
+      - ./jest.config.cjs:/usr/src/app/jest.config.cjs:ro
+      - ./eslint.config.mjs:/usr/src/app/eslint.config.mjs:ro
+      - ./.prettierrc:/usr/src/app/.prettierrc:ro
+      - ./.env:/usr/src/app/.env:ro
+      # Mount logs directory for persistent logs
+      - ./logs:/usr/src/app/logs
+      # Prevent overwriting node_modules (anonymous volume)
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    stdin_open: true # Enable interactive mode
+    tty: true        # Allocate a pseudo-TTY
+    networks:
+      - app-network
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - auth-service-dev
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus_data:
+
+networks:
+  app-network:
+    driver: bridge

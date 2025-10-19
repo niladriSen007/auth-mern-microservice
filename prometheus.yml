@@ -1,0 +1,21 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Your Node.js application
+  - job_name: 'node-ts-server'
+    static_configs:
+      - targets: ['192.168.1.3:5501']   # docker-compose service name
+    metrics_path: '/v1/metrics'              # endpoint where metrics are exposed
+    scrape_interval: 5s
+    scrape_timeout: 5s

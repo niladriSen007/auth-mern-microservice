@@ -1,0 +1,54 @@
+{
+    "name": "auth-service",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "dev": "npx tsx watch src/server.ts",
+        "test": "jest --watch --runInBand",
+        "format:check": "pnpm exec prettier . --check",
+        "format:fix": "pnpm exec prettier . --write",
+        "lint:check": "pnpm eslint .",
+        "lint:fix": "pnpm eslint . --fix",
+        "build": "tsc",
+        "prepare": "husky"
+    },
+    "keywords": [],
+    "author": "Niladri Sen",
+    "license": "ISC",
+    "packageManager": "pnpm@10.18.2",
+    "devDependencies": {
+        "@eslint/js": "^9.37.0",
+        "@jest/globals": "^30.2.0",
+        "@types/express": "^5.0.3",
+        "@types/jest": "^30.0.0",
+        "@types/node": "^24.8.1",
+        "@types/supertest": "^6.0.3",
+        "@types/winston": "^2.4.4",
+        "eslint": "^9.37.0",
+        "husky": "^9.1.7",
+        "jest": "^30.2.0",
+        "jest-environment-node": "^30.2.0",
+        "lint-staged": "^16.2.4",
+        "prettier": "3.6.2",
+        "supertest": "^7.1.4",
+        "ts-jest": "^29.4.5",
+        "tsx": "^4.20.6",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.46.1"
+    },
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "express": "^5.1.0",
+        "prom-client": "^15.1.3",
+        "winston": "^3.18.3",
+        "winston-daily-rotate-file": "^5.0.0"
+    },
+    "lint-staged": {
+        "*.ts": [
+            "pnpm format:fix",
+            "pnpm lint:fix"
+        ]
+    }
+}

@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "module": "CommonJS", // 👈 important
+        "moduleResolution": "Node", // 👈 Jest doesn't support NodeNext
+        "outDir": "./dist-jest"
+    },
+    "include": ["src", "**/*.test.ts", "**/*.spec.ts"]
+}
