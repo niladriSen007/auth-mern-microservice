@@ -1,5 +1,5 @@
-import { PingRepository } from './ping/ping.repository.js';
+import { AuthRepository } from './auth/auth.repository.js';
 
 export const repositories = {
-    pingRepository: new PingRepository(),
+    authRepository: new AuthRepository(),
 };

@@ -1,6 +1,6 @@
 import { services } from '../services/index.js';
-import { PingController } from './ping/ping.controller.js';
+import { AuthController } from './auth/auth.controller.js';
 
 export const controllers = {
-    pingController: new PingController(services.pingService),
+    authController: new AuthController(services.authService),
 };

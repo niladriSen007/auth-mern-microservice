@@ -1,6 +1,6 @@
 import { repositories } from '../repositories/index.js';
-import { PingService } from './ping/ping.service.js';
+import { AuthService } from './auth/auth.service.js';
 
 export const services = {
-    pingService: new PingService(repositories.pingRepository),
+    authService: new AuthService(repositories.authRepository),
 };
