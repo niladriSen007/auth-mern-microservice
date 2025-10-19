@@ -23,7 +23,7 @@ export const serverConfig: ServerConfig = {
     PORT: Number(process.env.PORT) ?? 5501,
     NODE_ENV: process.env.NODE_ENV ?? 'development',
     LOGGER_LEVEL: process.env.LOGGER_LEVEL ?? 'info',
-    DB_HOST: process.env.DB_HOST ?? 'localhost',
+    DB_HOST: process.env.DB_HOST ?? 'postgres-db',
     DB_PORT: Number(process.env.DB_PORT) ?? 5432,
     DB_USER: process.env.DB_USER ?? 'postgres',
     DB_PASSWORD: process.env.DB_PASSWORD ?? 'postgres',
