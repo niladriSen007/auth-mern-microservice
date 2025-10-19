@@ -5,7 +5,7 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "dev": "npx tsx watch src/server.ts",
+        "dev": "cross-env NODE_ENV=development npx tsx watch src/server.ts",
         "test": "jest",
         "test:watch": "jest --watch --runInBand",
         "format:check": "pnpm exec prettier . --check",
@@ -27,6 +27,7 @@
         "@types/node": "^24.8.1",
         "@types/supertest": "^6.0.3",
         "@types/winston": "^2.4.4",
+        "cross-env": "^10.1.0",
         "eslint": "^9.37.0",
         "husky": "^9.1.7",
         "jest": "^30.2.0",

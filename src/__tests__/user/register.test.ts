@@ -32,6 +32,21 @@ describe('User Registration', () => {
                 expect.stringContaining('json')
             );
         });
+
+        it('Should persist the user in the database', async () => {
+            const userData = {
+                firstName: 'Alice',
+                lastName: 'Smith',
+                email: 'alice.smith@example.com',
+                password: 'yetanothersecurepassword',
+            };
+
+            const response = await request(app)
+                .post('/api/v1/auth/register')
+                .send(userData);
+
+            expect(response.statusCode).toBe(201);
+        });
     });
 
     describe.skip('Sad Path', () => {

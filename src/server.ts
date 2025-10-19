@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import 'reflect-metadata';
 import { app } from './app.js';
 import { serverConfig } from './config/index.js';
 
