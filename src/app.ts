@@ -19,4 +19,4 @@ app.get('/', (req, res) => {
     }
 });
 
-app.use("/v1", v1Router)
+app.use('/api/v1', v1Router);
