@@ -78,6 +78,36 @@ describe('User Registration', () => {
             const userRepository = dbConnection.getRepository(User);
             expect(await userRepository.find()).toHaveLength(1);
         });
+
+        it('Should return the correct user first name from the database', async () => {
+            const userData = {
+                firstName: 'Bob',
+                lastName: 'Johnson',
+                email: 'bob.johnson@example.com',
+                password: 'supersecurepassword',
+            };
+
+            await request(app).post('/api/v1/auth/register').send(userData);
+
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users[0]!.firstName).toBe('Bob');
+        });
+
+        it('Should return the correct user last name from the database', async () => {
+            const userData = {
+                firstName: 'Charlie',
+                lastName: 'Brown',
+                email: 'charlie.brown@example.com',
+                password: 'yetanothersecurepassword',
+            };
+
+            await request(app).post('/api/v1/auth/register').send(userData);
+
+            const userRepository = dbConnection.getRepository(User);
+            const users = await userRepository.find();
+            expect(users[0]!.lastName).toBe('Brown');
+        });
     });
 
     describe.skip('Sad Path', () => {
