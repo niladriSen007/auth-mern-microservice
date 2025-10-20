@@ -20,9 +20,7 @@ export class AuthService {
 
             const hashedPass = await bcrypt.hash(req.body.password, 10);
             return await this.authRepository.registerUser({
-                email: req.body.email.trim(),
-                firstName: req.body.firstName.trim(),
-                lastName: req.body.lastName.trim(),
+                ...req.body,
                 password: hashedPass,
             });
         } catch (error) {
