@@ -1,8 +1,12 @@
 import bcrypt from 'bcryptjs';
 import { logger } from '../../config/logger.config.js';
-import type { RegisterUserRequest } from '../../dtos/auth/register-user.request.js';
+import type {
+    LoginUserRequest,
+    RegisterUserRequest,
+} from '../../dtos/auth/register-user.request.js';
 import { BadRequestError } from '../../middleware/error/types.js';
 import type { AuthRepository } from '../../repositories/auth/auth.repository.js';
+import type { LoginUserResponse } from '../../dtos/auth/register-user.response.js';
 
 export class AuthService {
     constructor(private readonly authRepository: AuthRepository) {}
@@ -33,5 +37,30 @@ export class AuthService {
                 'Error registering new user - AuthService.registerUser'
             );
         }
+    }
+
+    public async loginUser(req: LoginUserRequest): Promise<LoginUserResponse> {
+        logger.info('Logging in user', { body: req?.body });
+        const { email, password } = req.body;
+        const user = await this.authRepository.findUserByEmail(email);
+        if (!user) {
+            throw new BadRequestError(
+                'Invalid email or password - AuthService.loginUser'
+            );
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            throw new BadRequestError(
+                'Invalid email or password - AuthService.loginUser'
+            );
+        }
+        logger.info('User logged in successfully', { userId: user.id });
+        return {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            role: user.role,
+        };
     }
 }

@@ -15,3 +15,15 @@ export interface RegisterUserBody {
     firstName: string;
     lastName: string;
 }
+
+export interface LoginUserRequest extends Request {
+    body: {
+        email: string;
+        password: string;
+    };
+}
+
+export interface LoginUserBody {
+    email: string;
+    password: string;
+}
