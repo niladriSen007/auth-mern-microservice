@@ -7,6 +7,7 @@ import { AppDataSource } from '../../../config/data-source.js';
 import { logger } from '../../../config/logger.config.js';
 import { Roles } from '../../../constants/index.js';
 import { User } from '../../../entity/User.js';
+import { isJwt } from '../../utils/index.js';
 
 const REGISTER_API_ENDPOINT = '/api/v1/auth/register';
 
@@ -168,6 +169,42 @@ describe('User Registration', () => {
             // Assert
             expect(response.statusCode).toBe(400);
             expect(users).toHaveLength(1);
+        });
+
+        it('Should store the access token and refresh token on successful user registration in the cookie', async () => {
+            const userData = {
+                firstName: 'Rakesh',
+                lastName: 'K',
+                email: 'rakesh@mern.space',
+                password: 'password',
+            };
+
+            // Act
+            const response = await request(app)
+                .post(REGISTER_API_ENDPOINT)
+                .send(userData);
+
+            interface Headers {
+                'set-cookie': string[];
+            }
+
+            let accessToken: string | null = null;
+            let refreshToken: string | null = null;
+            const cookies =
+                (response.headers as unknown as Headers)['set-cookie'] || [];
+            cookies?.forEach((cookie) => {
+                if (cookie.startsWith('accessToken=')) {
+                    accessToken = cookie?.split(';')[0]?.split('=')[1] ?? null;
+                }
+                if (cookie.startsWith('refreshToken=')) {
+                    refreshToken = cookie?.split(';')[0]?.split('=')[1] ?? null;
+                }
+            });
+            expect(accessToken).not.toBeNull();
+            expect(refreshToken).not.toBeNull();
+
+            expect(isJwt(accessToken)).toBe(true);
+            expect(isJwt(refreshToken)).toBe(true);
         });
     });
 

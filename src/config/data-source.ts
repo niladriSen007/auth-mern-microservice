@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { User } from '../entity/User.js';
 import { serverConfig } from './index.js';
+import { RefreshToken } from '../entity/RefreshToken.js';
 
 export const AppDataSource = new DataSource({
     type: 'postgres',
@@ -12,7 +13,7 @@ export const AppDataSource = new DataSource({
     database: serverConfig?.DB_NAME || 'mern_auth_db',
     synchronize: serverConfig?.NODE_ENV !== 'production',
     logging: serverConfig?.NODE_ENV !== 'test',
-    entities: [User],
+    entities: [User, RefreshToken],
     subscribers: [],
     migrations: [],
 });

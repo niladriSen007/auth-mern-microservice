@@ -15,6 +15,7 @@ export default defineConfig(
             'src/config',
             'jest.config.cjs',
             'src/middleware',
+            'scripts'
         ],
     },
     {

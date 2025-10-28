@@ -1,20 +1,29 @@
+import type { Repository } from 'typeorm';
 import { AppDataSource } from '../../config/data-source.js';
 import { logger } from '../../config/logger.config.js';
 import { Roles } from '../../constants/index.js';
 import type { RegisterUserBody } from '../../dtos/auth/register-user.request.js';
+import type { RegisterUserResponse } from '../../dtos/auth/register-user.response.js';
 import { User } from '../../entity/User.js';
 
 export class AuthRepository {
-    constructor() {}
+    constructor(private readonly userRepository: Repository<User>) {}
 
-    public async registerUser(req: RegisterUserBody) {
-        const userRepo = AppDataSource.getRepository(User);
+    public async registerUser(
+        req: RegisterUserBody
+    ): Promise<RegisterUserResponse> {
         logger.info('Saving new user to the database', { body: req });
-        await userRepo.save({
+        const newUser = await this.userRepository.save({
             role: Roles.CUSTOMER,
             ...req,
         });
-        return 'User registered successfully';
+        return {
+            id: newUser.id,
+            email: newUser.email,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            role: newUser.role,
+        };
     }
 
     public async findUserByEmail(email: string) {

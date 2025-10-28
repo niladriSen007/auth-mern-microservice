@@ -28,4 +28,6 @@ export const serverConfig: ServerConfig = {
     DB_USER: process.env.DB_USER ?? 'postgres',
     DB_PASSWORD: process.env.DB_PASSWORD ?? 'postgres',
     DB_NAME: process.env.DB_NAME ?? 'mern_auth_db',
+    REFRESH_TOKEN_SECRET:
+        process.env.REFRESH_TOKEN_SECRET ?? 'your_refresh_token_secret',
 };
